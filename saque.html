@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmação de Saque</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Mantendo o mesmo estilo da página principal -->
+    <style>
+        body {
+            font-family: Montserrat, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: white;
+            width: 90%;
+            max-width: 400px;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            position: relative;
+        }
+
+        .popup-text {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .info-text {
+            padding-left: 5%;
+            padding-right: 5%;
+            text-align: justify;
+            font-size: 14px;
+            color: #444;
+            line-height: 1.5;
+        }
+
+        .valor-taxa {
+            font-size: 24px;
+            font-weight: bold;
+            color: #d32f2f;
+            background: #ffeaea;
+            padding: 10px;
+            border-radius: 8px;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .pagar-button, .confirmar-button {
+            background: linear-gradient(45deg, #06b32e, #048e24);
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 10px;
+        }
+
+        .pagar-button:hover, .confirmar-button:hover {
+            background: linear-gradient(45deg, #048e24, #06b32e);
+        }
+
+        .back-button {
+            display: block;
+            margin-top: 15px;
+            color: #06b32e;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .back-button:hover {
+            color: #048e24;
+        }
+
+        .pix-container {
+            display: none;
+            background: #e3f7e8;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border: 1px solid #06b32e;
+        }
+
+        .pix-key {
+            font-size: 18px;
+            font-weight: bold;
+            color: #06b32e;
+            word-break: break-all;
+        }
+
+        .copy-button {
+            margin-top: 10px;
+            background: #06b32e;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .copy-button:hover {
+            background: #048e24;
+        }
+
+        .confirmar-button {
+            display: none;
+            background: #ff9800;
+        }
+
+        .confirmar-button.aguardando {
+            background: #d32f2f;
+            cursor: not-allowed;
+        }
+
+        /* Estilo para a seção de avaliação fixa no canto direito */
+        .avaliacao-container {
+            position: fixed;
+            right: 20px;
+            top: 20%;
+            padding: 15px;
+            border-radius: 10px;
+            background: #fff3cd;
+            border: 1px solid #ffcc00;
+            display: block;  /* Agora está visível desde o início */
+            width: 250px;
+        }
+
+        .avaliacao-container img {
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .rating-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .rating-button {
+            background: #ffcc00;
+            color: black;
+            border: none;
+            padding: 8px 12px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .rating-button:hover {
+            background: #ffb300;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <span class="popup-text">DESBLOQUEAR SEU SALDO</span>
+        <div style="margin-bottom:20px"></div>
+        <p class="info-text">
+            Implementamos uma taxa anti-fraudes para prevenir fraudes e abusos nos saques que estavam ocorrendo no sistema.<br><br>
+            Fique tranquilo, você receberá o valor da taxa de volta juntamente com o montante do seu saque, após o pagamento da taxa de validação (captcha) para garantir que você é um humano e não um robô.<br><br>
+            <strong>Reembolso garantido!</strong> Caso você não receba o pagamento, o reembolso será realizado imediatamente, e o valor cairá na hora.
+        </p>
+
+        <p class="valor-taxa">Taxa: R$ 19,90</p>
+
+        <button class="pagar-button" onclick="exibirPix()">Pagar Taxa</button>
+
+        <div class="pix-container" id="pix-container">
+            <p class="popup-text">Realize o pagamento via PIX usando a chave:</p>
+            <p class="pix-key" id="pix-key">678d91ef-d74a-4e30-80c7-69e06870c343</p>
+            <button class="copy-button" onclick="copiarPix()">Copiar Chave PIX</button>
+
+            <button class="confirmar-button" id="confirmar-button" onclick="confirmarPagamento()">Confirmar Pagamento</button>
+        </div>
+
+        <a href="index.html" class="back-button">Voltar</a>
+    </div>
+
+    <!-- Seção de Avaliação fixa no canto direito, agora visível desde o início -->
+    <div class="avaliacao-container" id="avaliacao-container">
+        <p class="popup-text">Avalie sua experiência:</p>
+        <img src="https://d2lr0gp42cdhn1.cloudfront.net/1977756990/checkout-builder/izlfbvg2dzkbprjw9kuuz2nui" alt="Avaliação">
+        <div class="rating-buttons">
+            <button class="rating-button" onclick="avaliar(1)">1 ⭐</button>
+            <button class="rating-button" onclick="avaliar(2)">2 ⭐</button>
+            <button class="rating-button" onclick="avaliar(3)">3 ⭐</button>
+            <button class="rating-button" onclick="avaliar(4)">4 ⭐</button>
+            <button class="rating-button" onclick="avaliar(5)">5 ⭐</button>
+        </div>
+    </div>
+
+    <script>
+        function exibirPix() {
+            document.querySelector(".pagar-button").style.display = "none";
+            document.getElementById("pix-container").style.display = "block";
+            document.getElementById("confirmar-button").style.display = "block";
+        }
+
+        function copiarPix() {
+            var pixKey = document.getElementById("pix-key").textContent;
+            navigator.clipboard.writeText(pixKey).then(() => {
+                alert("Chave PIX copiada com sucesso!");
+            }).catch(err => {
+                alert("Erro ao copiar a chave PIX.");
+            });
+        }
+
+        function confirmarPagamento() {
+            let botaoConfirmar = document.getElementById("confirmar-button");
+            botaoConfirmar.textContent = "Aguardando pagamento...";
+            botaoConfirmar.classList.add("aguardando");
+            botaoConfirmar.disabled = true;
+        }
+
+        function avaliar(nota) {
+            alert("Obrigado pela sua avaliação de " + nota + " estrelas! 🎉");
+        }
+    </script>
+
+</body>
+</html>
